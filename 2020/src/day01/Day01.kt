@@ -2,7 +2,7 @@ package day01
 
 import util.readAllLinesAsInt
 
-fun day01a() {
+private fun day01a() {
     val input = readAllLinesAsInt("input.txt")
 
     val map = mutableSetOf<Int>()
@@ -16,7 +16,7 @@ fun day01a() {
     }
 }
 
-fun day01b() {
+private fun day01b() {
     val input = readAllLinesAsInt("input.txt")
 
     val map = mutableMapOf<Int, Pair<Int, Int>>()

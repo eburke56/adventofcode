@@ -2,7 +2,7 @@ package day03
 
 import util.readAllLines
 
-fun findTrees(dx: Int, dy: Int): Int {
+private fun findTrees(dx: Int, dy: Int): Int {
     val input = readAllLines("input.txt")
     val height = input.size
     val width = input[0].length

@@ -3,7 +3,7 @@ package day01
 import util.readAllLines
 import util.readAllLinesAsInt
 
-fun day02a() {
+private fun day02a() {
     val input = readAllLines("input.txt")
     var validCount = 0
 
@@ -23,7 +23,7 @@ fun day02a() {
     println(validCount)
 }
 
-fun day02b() {
+private fun day02b() {
     val input = readAllLines("input.txt")
     var validCount = 0
 
