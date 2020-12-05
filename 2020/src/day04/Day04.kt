@@ -1,6 +1,7 @@
 package day03
 
 import util.readAllLines
+import java.util.regex.Pattern
 
 private data class Passport(
     val byr: String?,
@@ -45,6 +46,7 @@ private data class Passport(
         }
     }
 
+    val pattern: Pattern = Pattern.compile("#[0-9a-f]{6}")
     val isValid: Boolean
         get() =
             isValidFast
@@ -52,8 +54,8 @@ private data class Passport(
                 && iyr?.toIntOrNull()?.let { it in 2010..2020 } ?: false
                 && eyr?.toIntOrNull()?.let { it in 2020..2030 } ?: false
                 && isValidHeight
-                && checkNotNull(hcl).let { it.length == 7 && it[0] == '#' && 6 == it.substring(1).count { it in '0'..'9' || it in 'a'..'f' } }
-                && checkNotNull(ecl).let { listOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth").contains(it) }
+                && checkNotNull(hcl).let { pattern.matcher(it).matches() }
+                && checkNotNull(ecl).let { setOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth").contains(it) }
                 && checkNotNull(pid).let { it.length == 9 && it.toIntOrNull() != null  }
 }
 
