@@ -2,10 +2,6 @@ package day03
 
 import util.readAllLines
 
-private fun findHighestSeat(seats: Set<Int>): Int {
-    return seats.max() ?: -1
-}
-
 private fun getAnswers(filename: String): List<Set<Char>> {
     val result = mutableListOf<Set<Char>>()
     val set = mutableSetOf<Char>()
@@ -26,11 +22,6 @@ private fun getAnswers(filename: String): List<Set<Char>> {
     }
 
     return result
-}
-
-private fun getAnswersCount(filename: String): Int {
-    val list = getAnswers(filename)
-    return list.sumBy { it.size }
 }
 
 private fun getEveryoneAnswers(filename: String): List<Set<Char>> {
@@ -60,23 +51,18 @@ private fun getEveryoneAnswers(filename: String): List<Set<Char>> {
     return result
 }
 
-private fun getEveryoneCount(filename: String): Int {
-    val list = getEveryoneAnswers(filename)
-    return list.sumBy { it.size }
-}
-
 fun main() {
     var count: Int
 
-    count = getAnswersCount("test.txt")
+    count = getAnswers("test.txt").sumBy { it.size }
     println(count)
 
-    count = getAnswersCount("input.txt")
+    count = getAnswers("input.txt").sumBy { it.size }
     println(count)
 
-    count = getEveryoneCount("test.txt")
+    count = getEveryoneAnswers("test.txt").sumBy { it.size }
     println(count)
 
-    count = getEveryoneCount("input.txt")
+    count = getEveryoneAnswers("input.txt").sumBy { it.size }
     println(count)
 }
