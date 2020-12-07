@@ -3,10 +3,6 @@ package day03
 import util.readAllLines
 import java.util.regex.Pattern
 
-data class Node(val type: String, val count: Int = 0) {
-    val children = mutableListOf<Node>()
-}
-
 private fun getRules(filename: String): Map<String, Map<String, Int>> {
     val input = readAllLines(filename)
     val contentsPattern = Pattern.compile("([0-9])+ (.*)? bag.*")
