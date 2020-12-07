@@ -7,23 +7,6 @@ data class Node(val type: String, val count: Int = 0) {
     val children = mutableListOf<Node>()
 }
 
-//var root: Node? = null
-//
-//private fun insertNode(parent: Node?, type: String, count: Int) {
-//    if (parent == null) {
-//        root = Node(type, count)
-//        return
-//    }
-//
-//    if (parent.type == type) {
-//
-//    }
-//
-//    parent.children.forEach {
-//        if (it.type == type)
-//    }
-//}
-
 private fun getRules(filename: String): Map<String, Map<String, Int>> {
     val input = readAllLines(filename)
     val contentsPattern = Pattern.compile("([0-9])+ (.*)? bag.*")
