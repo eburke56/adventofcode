@@ -1,4 +1,4 @@
-package day03
+package day07
 
 import util.readAllLines
 import java.util.regex.Pattern

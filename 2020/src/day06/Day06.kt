@@ -1,4 +1,4 @@
-package day03
+package day06
 
 import util.readAllLines
 
