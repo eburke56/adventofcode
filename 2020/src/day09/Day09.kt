@@ -7,10 +7,11 @@ private fun findFirstFailure(filename: String, preambleLength: Int): Pair<Long, 
     val list = original.toMutableList()
 
     while (list.size > preambleLength) {
-        val testList = list.take(preambleLength)
         val testValue = list[preambleLength]
-        if (!testList.any { testList.contains(testValue - it) }) {
-            return Pair(testValue, original)
+        list.take(preambleLength).let { testList ->
+            if (!testList.any { testList.contains(testValue - it) }) {
+                return Pair(testValue, original)
+            }
         }
         list.removeAt(0)
     }
