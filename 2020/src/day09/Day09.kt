@@ -1,31 +1,18 @@
 package day08
 
-import util.readAllLinesAs
-
-private fun readInput(filename: String): MutableList<Long> =
-    mutableListOf<Long>().apply { addAll(readAllLinesAs(filename) { it.toLong() }) }
-
-private fun isSumOfTwoNumbers(list: List<Long>, number: Long): Boolean {
-    list.forEach {
-        if (list.contains(number - it)) {
-            return true
-        }
-    }
-
-    return false
-}
+import util.readAllLinesAsLong
 
 private fun findFirstFailure(filename: String, preambleLength: Int): Pair<Long, List<Long>> {
-    val input = readInput(filename)
-    val inputCopy = input.toList()
+    val original = readAllLinesAsLong(filename)
+    val list = original.toMutableList()
 
-    while (input.size > preambleLength) {
-        val testList = input.take(preambleLength)
-        val testValue = input[preambleLength]
-        if (!isSumOfTwoNumbers(testList, testValue)) {
-            return Pair(testValue, inputCopy)
+    while (list.size > preambleLength) {
+        val testList = list.take(preambleLength)
+        val testValue = list[preambleLength]
+        if (!testList.any { testList.contains(testValue - it) }) {
+            return Pair(testValue, original)
         }
-        input.removeAt(0)
+        list.removeAt(0)
     }
 
     return Pair(-1, listOf())
