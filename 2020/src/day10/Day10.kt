@@ -1,9 +1,10 @@
 package day10
 
 import util.readAllLinesAsInt
+import util.readAllLinesAsLong
 
 private fun readInput(filename: String) =
-    readAllLinesAsInt(filename).sorted().toMutableList().apply {
+    readAllLinesAsLong(filename).sorted().toMutableList().apply {
         add(0, 0)
         add(checkNotNull(max()) + 3)
     }
@@ -13,20 +14,22 @@ private fun findOnesAndThrees(filename: String) {
     input.mapIndexed { index, value ->
         if (index > 0) value - input[index-1] else 0
     }.apply {
-        val ones = count { it == 1 }
-        val threes = count { it == 3 }
+        val ones = count { it == 1L }
+        val threes = count { it == 3L }
         println(ones * threes)
     }
 }
 
-private fun traverse(map: Map<Int, List<Int>>, start: Int): Int {
+private fun traverse(map: Map<Int, List<Int>>, start: Int): Long {
     val list = checkNotNull(map[start])
     return if (list.isNotEmpty()) {
-        list.sumBy {
-            traverse(map, it)
+        var sum = 0L
+        list.forEach {
+            sum += traverse(map, it)
         }
+        sum
     } else {
-        1
+        1L
     }
 }
 
