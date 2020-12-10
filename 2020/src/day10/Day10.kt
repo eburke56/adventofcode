@@ -35,13 +35,14 @@ private fun traverse(map: Map<Int, List<Int>>, start: Int): Long {
 
 private fun findPossibleArrangements(filename: String) {
     val input = readInput(filename)
+    input.reverse()
     val map = mutableMapOf<Int, MutableList<Int>>()
 
     input.forEachIndexed { index, value ->
         val list = mutableListOf<Int>()
         map[index] = list
 
-        for (i in index + 1 until input.size) {
+        for (i in index - 1 downTo 0) {
             if (input[i] - value <= 3) {
                 list.add(i)
             } else {
