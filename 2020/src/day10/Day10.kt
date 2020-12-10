@@ -19,24 +19,35 @@ private fun findOnesAndThrees(filename: String) {
     }
 }
 
+private fun traverse(map: Map<Int, List<Int>>, start: Int): Int {
+    val list = checkNotNull(map[start])
+    return if (list.isNotEmpty()) {
+        list.sumBy {
+            traverse(map, it)
+        }
+    } else {
+        1
+    }
+}
+
 private fun findPossibleArrangements(filename: String) {
     val input = readInput(filename)
+    val map = mutableMapOf<Int, MutableList<Int>>()
 
-    val counts = input.mapIndexed { index, value ->
-        var count = 1
-        for (i in index + 2 until input.size) {
+    input.forEachIndexed { index, value ->
+        val list = mutableListOf<Int>()
+        map[index] = list
+
+        for (i in index + 1 until input.size) {
             if (input[i] - value <= 3) {
-                count++
+                list.add(i)
             } else {
                 break
             }
         }
-        count
     }
 
-    val combinations = counts.fold(1) { product, item ->
-        product * item
-    }
+    val combinations = traverse(map, 0)
 
     println(combinations)
 }
@@ -46,4 +57,6 @@ fun main() {
 //    findOnesAndThrees("test2.txt")
 //    findOnesAndThrees("input.txt")
     findPossibleArrangements("test.txt")
+    findPossibleArrangements("test2.txt")
+    findPossibleArrangements("input.txt")
 }
