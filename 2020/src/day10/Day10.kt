@@ -1,10 +1,10 @@
 package day10
 
 import util.readAllLinesAsInt
-import util.readAllLinesAsLong
+import java.lang.IllegalStateException
 
 private fun readInput(filename: String) =
-    readAllLinesAsLong(filename).sorted().toMutableList().apply {
+    readAllLinesAsInt(filename).sorted().toMutableList().apply {
         add(0, 0)
         add(checkNotNull(max()) + 3)
     }
@@ -14,46 +14,61 @@ private fun findOnesAndThrees(filename: String) {
     input.mapIndexed { index, value ->
         if (index > 0) value - input[index-1] else 0
     }.apply {
-        val ones = count { it == 1L }
-        val threes = count { it == 3L }
+        val ones = count { it == 1 }
+        val threes = count { it == 3 }
         println(ones * threes)
-    }
-}
-
-private fun traverse(map: Map<Int, List<Int>>, start: Int): Long {
-    val list = checkNotNull(map[start])
-    return if (list.isNotEmpty()) {
-        var sum = 0L
-        list.forEach {
-            sum += traverse(map, it)
-        }
-        sum
-    } else {
-        1L
     }
 }
 
 private fun findPossibleArrangements(filename: String) {
     val input = readInput(filename)
-    input.reverse()
-    val map = mutableMapOf<Int, MutableList<Int>>()
+    println (input.joinToString { "%3s".format(it) })
 
-    input.forEachIndexed { index, value ->
-        val list = mutableListOf<Int>()
-        map[index] = list
+    var product = 1L
+    var tempProduct = 1
 
-        for (i in index - 1 downTo 0) {
+    val counts = input.mapIndexed { index, value ->
+        var count = 1
+        for (i in index + 2 until input.size) {
             if (input[i] - value <= 3) {
-                list.add(i)
+                count++
             } else {
                 break
             }
         }
+        count
     }
 
-    val combinations = traverse(map, 0)
+    println (counts.joinToString { "%3s".format(it) })
 
-    println(combinations)
+    var numThrees = 0
+
+    counts.forEach { value ->
+        when (value) {
+            1 -> {
+                product *= tempProduct
+                numThrees = 0
+                tempProduct = 1
+            }
+            2 -> {
+                tempProduct *= when (numThrees) {
+                    0 -> 2
+                    1 -> 4
+                    2 -> 8
+                    else -> throw IllegalStateException()
+                }
+                product *= tempProduct
+                numThrees = 0
+                tempProduct = 1
+            }
+            3 -> {
+                numThrees++
+            }
+            else -> throw IllegalStateException()
+        }
+    }
+
+    println(product)
 }
 
 fun main() {
@@ -62,5 +77,5 @@ fun main() {
 //    findOnesAndThrees("input.txt")
     findPossibleArrangements("test.txt")
     findPossibleArrangements("test2.txt")
-    findPossibleArrangements("input.txt")
+//    findPossibleArrangements("input.txt")
 }
