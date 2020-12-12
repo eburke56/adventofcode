@@ -4,11 +4,6 @@ import util.readAllLines
 import java.lang.IllegalStateException
 import kotlin.math.abs
 
-data class Waypoint(
-    val x: Int,
-    val y: Int
-)
-
 data class Position(
     val facing: Char,
     val x: Int,
@@ -20,6 +15,12 @@ private fun readInput(filename: String): List<Pair<Char, Int>> {
     return input.map { Pair(it[0], it.substring(1).toInt()) }
 }
 
+private fun message(message: String) {
+    if (verbose) {
+        println(message)
+    }
+}
+
 private fun makeTurn(currentDirection: Char, turnDirection: Char, degrees: Int): Char {
     val loop = listOf('N', 'E', 'S', 'W')
     val index = loop.indexOf(currentDirection)
@@ -29,7 +30,7 @@ private fun makeTurn(currentDirection: Char, turnDirection: Char, degrees: Int):
         if (newIndex < 0) newIndex += 4
     }
     return loop.get(newIndex % 4).apply {
-        println ("    new direction = $this")
+        message("    new direction = $this")
     }
 }
 
@@ -41,25 +42,25 @@ private fun proceed(
     var nextFacing = currentPosition.facing
     var nextX = currentPosition.x
     var nextY = currentPosition.y
-    println ("Pos = $currentPosition, command = $command, distance = $distance")
+    message("Proceed: pos = $currentPosition, command = $command, distance = $distance")
 
     val getNextDistance = { command: Char, distance: Int ->
         when (command) {
             'N' -> {
                 nextY += distance
-                println ("    move N, new Y = $nextY")
+                message("    move N, new Y = $nextY")
             }
             'E' -> {
                 nextX += distance
-                println ("    move E, new X = $nextX")
+                message("    move E, new X = $nextX")
             }
             'S' -> {
                 nextY -= distance
-                println ("    move S, new Y = $nextY")
+                message("    move S, new Y = $nextY")
             }
             'W' -> {
                 nextX -= distance
-                println ("    move W, new X = $nextX")
+                message("    move W, new X = $nextX")
             }
             else -> throw IllegalStateException()
         }
@@ -76,9 +77,9 @@ private fun proceed(
 }
 
 private fun manhattan(filename: String) {
-    val input = readInput(filename)
     var currentPosition = Position('E', 0, 0)
 
+    val input = readInput(filename)
     input.forEach { (command, distance) ->
         currentPosition = proceed(currentPosition, command, distance)
     }
@@ -86,7 +87,57 @@ private fun manhattan(filename: String) {
     println("Manhattan $filename = ${abs(currentPosition.x) + abs(currentPosition.y)}")
 }
 
+private fun moveWithWaypoint(filename: String) {
+    var waypointX = 10
+    var waypointY = 1
+    var currentPosition = Position('E', 0, 0)
+
+    val input = readInput(filename)
+    input.forEach { (command, distance) ->
+        message("WAY: pos = $currentPosition, way = ($waypointX, $waypointY), command = $command, distance = $distance")
+        when (command) {
+            'N' -> {
+                waypointY += distance
+                message("    move waypoint N, new waypointY = $waypointY")
+            }
+            'E' -> {
+                waypointX += distance
+                message("    move waypoint E, new waypointX = $waypointX")
+            }
+            'S' -> {
+                waypointY -= distance
+                message("    move waypoint S, new waypointY = $waypointY")
+            }
+            'W' -> {
+                waypointX -= distance
+                message("    move waypoint W, new waypointX = $waypointX")
+            }
+            'F' -> {
+                message("    move by ${distance * waypointX}, ${distance * waypointY}")
+                currentPosition = proceed(currentPosition, 'E', distance * waypointX)
+                currentPosition = proceed(currentPosition, 'N', distance * waypointY)
+            }
+            'R', 'L' -> {
+                message("    rotate $command ${(distance / 2) % 4} times")
+                for (i in 1..(distance / 2) % 4) {
+                    val tmp = waypointX
+                    waypointX = if (command == 'R') waypointY else -waypointY
+                    waypointY = if (command == 'R') -tmp else tmp
+                    message("    rotated to $waypointX, $waypointY")
+                }
+            }
+            else -> throw IllegalStateException()
+        }
+    }
+
+    println("Waypoint $filename = ${abs(currentPosition.x) + abs(currentPosition.y)}")
+}
+
+private val verbose = false
+
 fun main() {
-//    manhattan("test.txt")
+    manhattan("test.txt")
     manhattan("input.txt")
+    moveWithWaypoint("test.txt")
+    moveWithWaypoint("input.txt")
 }
