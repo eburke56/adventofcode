@@ -98,63 +98,58 @@ private fun findSteadyState2(filename: String) {
     val countAdjacentOccupied = { map: Array<CharArray>, row: Int, col: Int ->
         var occupied = 0
         var iteration = 1
-        val alreadySeen = Array(3) { BooleanArray(3) { false } }
-        alreadySeen[1][1] = true
 
+        val alreadySeen = Array(3) { BooleanArray(3) { false } }
+        alreadySeen[1][1] = true // skip the cell we're looking at
+
+        // if we've already hit a seat in every direction, we're done
         while (alreadySeen.any { rc -> rc.any { cell -> !cell } }) {
-//            println("iteration $iteration")
 
             val minrow = row - iteration
             val maxrow = row + iteration
             val mincol = col - iteration
             val maxcol = col + iteration
 
+            // if the range is completely out of bounds, we're done
             if (minrow !in map.indices && maxrow !in map.indices &&
                 mincol !in map[0].indices && maxcol !in map[0].indices) {
-//                println("$minrow, $mincol -> $maxrow, $maxcol out of bounds, done")
                 break
             }
 
             val rowRange = minrow..maxrow
             val colRange = mincol..maxcol
-//            println("    testing $minrow, $mincol -> $maxrow, $maxcol")
 
             for (r in rowRange step iteration) {
                 for (c in colRange step iteration) {
-//                    println("        cell $r, $c")
+                    // skip the cell
                     if (r == row && c == col) {
-//                        println("        --> skip cell")
                         continue
                     }
 
+                    // this puts i,j in [-1,1].  could do the outer loop better but I'm lazy
                     val i = (r - minrow) / iteration
                     val j = (c - mincol) / iteration
-//                    println("        --> i,j = $i, $j")
+
                     if (i in alreadySeen.indices && j in alreadySeen[i].indices) {
+                        // if this cell is not in bounds, we're done in that direction
                         if (r !in map.indices || c !in map[0].indices) {
-//                            println("        --> $r, $c out of bounds, mark $i, $j as seen")
                             alreadySeen[i][j] = true
                         }
 
+                        // already tested this direction
                         if (alreadySeen[i][j]) {
-//                            println("        --> $i, $j already seen, continue")
                             continue
                         }
 
-                        val cell = getCell(map, r, c)
-//                        println("        --> value == $cell")
-                        when (cell) {
+                        when (getCell(map, r, c)) {
                             '#' -> {
                                 occupied++
-//                                println("            --> occupied, new count = $occupied, mark $i, $j as seen")
                                 alreadySeen[i][j] = true
                             }
                             'L' -> {
-//                                println("            --> empty, new count = $occupied, mark $i, $j as seen")
                                 alreadySeen[i][j] = true
                             }
                             '.' -> {
-//                                println("            --> floor, do nothing")
                             }
                         }
                     }
@@ -169,7 +164,6 @@ private fun findSteadyState2(filename: String) {
     var map: Array<CharArray> = cloneArray(input)
 
     while (changed) {
-        //dumpMap(map)
         val newMap = cloneArray(map)
         changed = false
         for (row in map.indices) {
@@ -199,8 +193,8 @@ private fun findSteadyState2(filename: String) {
 }
 
 fun main() {
-//    findSteadyState1("test.txt")
-//    findSteadyState1("input.txt")
+    findSteadyState1("test.txt")
+    findSteadyState1("input.txt")
     findSteadyState2("test.txt")
     findSteadyState2("input.txt")
 }
