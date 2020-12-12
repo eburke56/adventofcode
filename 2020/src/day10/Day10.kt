@@ -1,7 +1,6 @@
 package day10
 
 import util.readAllLinesAsInt
-import java.lang.IllegalStateException
 
 private fun readInput(filename: String) =
     readAllLinesAsInt(filename).sorted().toMutableList().apply {
@@ -12,7 +11,7 @@ private fun readInput(filename: String) =
 private fun findOnesAndThrees(filename: String) {
     val input = readInput(filename)
     input.mapIndexed { index, value ->
-        if (index > 0) value - input[index-1] else 0
+        if (index > 0) value - input[index - 1] else 0
     }.apply {
         val ones = count { it == 1 }
         val threes = count { it == 3 }
@@ -20,62 +19,56 @@ private fun findOnesAndThrees(filename: String) {
     }
 }
 
+private fun traverse(
+    map: Map<Int, List<Int>>,
+    cache: MutableMap<Int, Long>,
+    start: Int
+): Long {
+    if (cache.containsKey(start)) {
+        return checkNotNull(cache[start])
+    }
+
+    val list = checkNotNull(map[start])
+    return if (list.isNotEmpty()) {
+        var sum = 0L
+        list.forEach {
+            sum += traverse(map, cache, it)
+        }
+        sum
+    } else {
+        1
+    }.also {
+        cache[start] = it
+    }
+}
+
 private fun findPossibleArrangements(filename: String) {
     val input = readInput(filename)
-    println (input.joinToString { "%3s".format(it) })
+    val map = mutableMapOf<Int, MutableList<Int>>()
 
-    var product = 1L
-    var tempProduct = 1
+    input.forEachIndexed { index, value ->
+        val list = mutableListOf<Int>()
+        map[index] = list
 
-    val counts = input.mapIndexed { index, value ->
-        var count = 1
-        for (i in index + 2 until input.size) {
+        for (i in index + 1 until input.size) {
             if (input[i] - value <= 3) {
-                count++
+                list.add(i)
             } else {
                 break
             }
         }
-        count
     }
 
-    println (counts.joinToString { "%3s".format(it) })
-
-    var numThrees = 0
-
-    counts.forEach { value ->
-        when (value) {
-            1 -> {
-                product *= tempProduct
-                numThrees = 0
-                tempProduct = 1
-            }
-            2 -> {
-                tempProduct *= when (numThrees) {
-                    0 -> 2
-                    1 -> 4
-                    2 -> 8
-                    else -> throw IllegalStateException()
-                }
-                product *= tempProduct
-                numThrees = 0
-                tempProduct = 1
-            }
-            3 -> {
-                numThrees++
-            }
-            else -> throw IllegalStateException()
-        }
-    }
-
-    println(product)
+    val cache = mutableMapOf<Int, Long>()
+    val combinations = traverse(map, cache, 0)
+    println(combinations)
 }
 
 fun main() {
-//    findOnesAndThrees("test.txt")
-//    findOnesAndThrees("test2.txt")
-//    findOnesAndThrees("input.txt")
+    findOnesAndThrees("test.txt")
+    findOnesAndThrees("test2.txt")
+    findOnesAndThrees("input.txt")
     findPossibleArrangements("test.txt")
     findPossibleArrangements("test2.txt")
-//    findPossibleArrangements("input.txt")
+    findPossibleArrangements("input.txt")
 }
