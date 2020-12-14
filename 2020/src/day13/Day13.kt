@@ -20,57 +20,47 @@ private fun findFirstBus(filename: String) {
     println("First bus $filename: ts = $timestamp, id = $bestId, nextArrival = $bestArrival --> ${bestId * (bestArrival - timestamp)}")
 }
 
-private fun findSequentialBuses(filename: String) {
-    val input = readAllLines(filename)
-    val buses = input[1].split(",").map { if (it == "x") 0 else it.toInt() }
-    val filteredBuses = buses.filter { it > 0 }
-    val maxBus = checkNotNull(filteredBuses.max())
-    var timestamp = - buses.indexOf(maxBus).toLong()
-
-    println ("Buses: ${buses.joinToString()}")
-    println ("Bus 0: ${buses[0]}")
-    println ("Filtered: ${filteredBuses.joinToString()}")
-
-    var found = false
-    while (!found) {
-        timestamp += maxBus
-        found = true
-//        println ("Test: ts = $timestamp")
-        for (currentBusId in filteredBuses) {
-            val currentBusIndex = buses.indexOf(currentBusId).toLong()
-//            println ("    testing id = $currentBusId, index = $currentBusIndex, mod = ${(timestamp + currentBusIndex) % currentBusId}")
-            if ((timestamp + currentBusIndex) % currentBusId != 0L) {
-//                println ("    bail")
-                found = false
-                break
-            }
-        }
+private fun findSequentialBuses(
+    start: Long,
+    increment: Int,
+    allBuses: List<Int>,
+    filteredBuses: List<Int>
+): Long {
+    if (filteredBuses.isEmpty()) {
+        return start
     }
 
-//    sortedOtherBuses.forEach { currentBusId ->
-//        println("Testing bus $currentBusId with increment $increment")
-//        val otherBusIndex = buses.indexOf(currentBusId).toLong()
-//        while (true) {
-//            timestamp += increment
-////            println ("    Testing timestamp $timestamp: mod = ${timestamp % id}, obi = $otherBusIndex")
-//            if (timestamp % currentBusId == otherBusIndex) {
-//                // make sure no buses land in any X row between this row and the 0th row of this set
-//                val zero = timestamp - otherBusIndex
-//                xIndicies.forEach { xIndex ->
-//                    sortedOtherBuses.any { otherBusId -> (zero + xIndex) % otherBusId == buses.indexOf(otherBusId).toLong() } )
-//                }
-//                println("    Found bus $currentBusId with index $otherBusIndex at timestamp $timestamp, isAlsoInAnX = $isAlsoInAnX")
-//
-//                if (!isAlsoInAnX) {
-//                    break
-//                }
-//            }
-//        }
-//        increment = currentBusId
-//        println ("    New increment is $increment")
-//    }
+    var timestamp = start
+    var result = 0L
 
-    println ("Sequential $filename: $timestamp")
+    while (result == 0L) {
+//        println("Testing $timestamp with buses ${filteredBuses.joinToString()}")
+        val currentBusId = filteredBuses[0]
+        val currentBusIndex = allBuses.indexOf(currentBusId).toLong()
+//            println("    testing id = $currentBusId, index = $currentBusIndex, mod = ${(timestamp + currentBusIndex) % currentBusId}")
+        val mod = (timestamp + currentBusIndex) % currentBusId
+        if (mod != 0L) {
+//                println("    bail")
+            result = 0L
+            break
+        } else {
+//                println("    found, recurse with increment ${filteredBuses[0]}, list [${filteredBuses.subList(1, filteredBuses.size).joinToString()}]")
+            result = findSequentialBuses(timestamp, increment, allBuses, filteredBuses.subList(1, filteredBuses.size))
+        }
+
+        timestamp += increment
+    }
+
+//    println("    exit with ts $result")
+    return result
+}
+
+private fun findSequentialBuses(filename: String) {
+    val buses = readAllLines(filename)[1].split(",").map { if (it == "x") 0 else it.toInt() }
+    val filteredBuses = buses.filter { it > 0 }.sortedDescending()
+    val maxBus = checkNotNull(filteredBuses.max())
+    val timestamp = findSequentialBuses((maxBus - buses.indexOf(maxBus)).toLong(), maxBus, buses, filteredBuses)
+    println("Sequential $filename: $timestamp")
 }
 
 fun main() {
