@@ -1,7 +1,6 @@
 package year2021.day05
 
 import util.readAllLines
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -13,7 +12,7 @@ private class Node(initialValue: Int) {
 }
 
 private class Board(values: List<String>, val allowDiagonal: Boolean = false) {
-    private val rows = mutableMapOf<Int, MutableMap<Int, Node>>()
+    private val data = mutableMapOf<Pair<Int, Int>, Node>()
 
     init {
         values.forEach { line ->
@@ -25,66 +24,42 @@ private class Board(values: List<String>, val allowDiagonal: Boolean = false) {
             val ymin = min(y1, y2)
             val ymax = max(y1, y2)
 
-            println("Testing $x1,$y1 --> $x2,$y2")
-            val slope = if (xmax - xmin != 0) abs((ymax - ymin) / (xmax - xmin)) else 0
-            if (allowDiagonal && slope == 1) {
+            if (allowDiagonal && (ymax - ymin == xmax - xmin)) {
                 val xstep = (if (x2 > x1) 1 else -1)
                 val ystep = (if (y2 > y1) 1 else -1)
-                println("     Diagonal, xstep = $xstep, ystep = $ystep")
-                var c = x1
-                var r = y1
-                for (i in 0 until (xmax-xmin)) {
-                    if (!rows.containsKey(c)) { rows[c] = mutableMapOf() }
-                    val row = rows[c] ?: error("Bad row")
-                    if (!row.containsKey(r)) {
-                        row[r] = Node(1)
-                    } else {
-                        row[r]?.increment()
-                    }
-                    println("        Set $c,$r --> ${row[r]?.value}")
-                    c += xstep
-                    r += ystep
+                var key = Pair(x1, y1)
+                repeat((xmin..xmax).count()) {
+                    incrementNode(key)
+                    key = Pair(key.first + xstep, key.second + ystep)
                 }
             } else if (xmin == xmax) {
-                println("     Vertical")
-                if (!rows.containsKey(xmin)) { rows[xmin] = mutableMapOf() }
-                val row = rows[xmin] ?: error("Bad row")
-
-                for (i in ymin..ymax) {
-                    if (!row.containsKey(i)) {
-                        row[i] = Node(1)
-                    } else {
-                        row[i]?.increment()
-                    }
-                    println("        Set $xmin,$i --> ${row[i]?.value}")
+                (ymin..ymax).forEach {
+                    incrementNode(Pair(x1, it))
                 }
             } else if (ymin == ymax) {
-                println("     Horizontal")
-                for (i in xmin..xmax) {
-                    if (!rows.containsKey(i)) { rows[i] = mutableMapOf() }
-                    val row = rows[i] ?: error("Bad row")
-
-                    if (!row.containsKey(ymin)) {
-                        row[ymin] = Node(1)
-                    } else {
-                        row[ymin]?.increment()
-                    }
-                    println("        Set $i,$ymin --> ${row[ymin]?.value}")
+                (xmin..xmax).forEach {
+                    incrementNode(Pair(it, ymin))
                 }
             }
         }
     }
 
+    private fun incrementNode(key: Pair<Int, Int>) {
+        if (!data.containsKey(key)) {
+            data[key] = Node(1)
+        } else {
+            data[key]?.increment()
+        }
+    }
+
     fun countNodesGreaterThan(value: Int): Int {
-        return rows
-            .flatMap { row -> row.value.values.filter { it.value > value } }
-            .count()
+        return data.values.count { it.value > value }
     }
 }
 
 fun main() {
     part1()
-//    part2()
+    part2()
 }
 
 private fun part1() {
@@ -94,7 +69,7 @@ private fun part1() {
 }
 
 private fun part2() {
-    val input = readAllLines("test.txt")
+    val input = readAllLines("input.txt")
     val board = Board(input, true)
     println(board.countNodesGreaterThan(1))
 }
