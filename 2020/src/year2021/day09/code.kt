@@ -102,15 +102,3 @@ private fun findLows(grid: List<List<Int>>): MutableSet<Cell> {
     }
     return lows
 }
-
-private fun printBasin(grid: List<List<Int>>, basin: Set<Cell>, maxRow: Int, maxCol: Int) {
-    println("---------------------------------------------------")
-    (0..maxRow).forEach { row ->
-        (0..maxCol).forEach { col ->
-            val value = grid[row][col]
-            print(if (basin.contains(Cell(row, col))) "($value)" else " $value ")
-        }
-        println()
-    }
-    println("---------------------------------------------------")
-}
