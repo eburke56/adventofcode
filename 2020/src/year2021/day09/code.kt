@@ -23,7 +23,8 @@ private fun part2() {
     val basins = mutableSetOf<Set<Cell>>()
 
     while (lows.isNotEmpty()) {
-        val basin = testCell(grid, lows, maxRow, maxCol)
+        val basin = mutableSetOf<Cell>()
+        testCell(grid, lows, maxRow, maxCol, basin)
         basins.add(basin)
     }
 
@@ -38,20 +39,21 @@ private fun testCell(grid: List<List<Int>>,
                      lows: MutableSet<Cell>,
                      maxRow: Int,
                      maxCol: Int,
-                     basinOrNull: MutableSet<Cell>? = null,
-                     cellUnderTest: Cell? = null): Set<Cell> {
-    val basin = basinOrNull ?: mutableSetOf()
+                     basin: MutableSet<Cell>,
+                     cellUnderTest: Cell? = null) {
     val cell = cellUnderTest ?: lows.first()
     val row = cell.row
     val col = cell.col
     val currentValue = grid[row][col]
 
+    // stop at the top
     if (currentValue == 9) {
-        return basin
+        return
     }
 
     basin.add(cell)
 
+    // don't re-test this cell if it's also a low
     if (lows.contains(cell)) {
         lows.remove(cell)
     }
@@ -80,8 +82,6 @@ private fun testCell(grid: List<List<Int>>,
             testCell(grid, lows, maxRow, maxCol, basin, nextCell)
         }
     }
-
-    return basin
 }
 
 private fun findLows(grid: List<List<Int>>): MutableSet<Cell> {
