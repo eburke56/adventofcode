@@ -30,9 +30,9 @@ private fun part1() {
         var score = 0
 
         for (it in line) {
-            when {
-                it in OPENERS-> stack.push(it)
-                it in CLOSERS -> if (!checkClose(stack, it)) { score = SCORES[it]!!; break }
+            when (it) {
+                in OPENERS -> stack.push(it)
+                in CLOSERS -> if (!checkClose(stack, it)) { score = SCORES[it]!!; break }
                 else -> error("Illegal character in processing")
             }
         }
